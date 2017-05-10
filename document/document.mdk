@@ -80,20 +80,14 @@ with a focus on simplicity and plain text readability.
 - 正常流测试：
 
 
+![case1_f]
 1. 测试赛题给出的拓扑图及约束条件:
+
+[case1_f]: images/case1_f.jpg "case1_f" { width:auto; max-width:90% }
+
+
 
 2. 某个节点的多条边均为必经路径；
 
-3. 某个节点的相邻节点均为必经点；
-
-4. 多个相邻节点和相邻路径均为必经路径；
-
-5. 必经点或必经路径到终点的花费大于起点(即更改起点或终点)；
-
-6. 拓扑图中没有起点和终点时，会给出相应提示；
-
-7. 当没有任何一条路径能够从起点到达终点时，会给出相应提示；
-
-Enjoy!
 
 [reference manual]: http://research.microsoft.com/en-us/um/people/daan/madoko/doc/reference.html  "Madoko reference manual"
