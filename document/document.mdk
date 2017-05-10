@@ -82,12 +82,14 @@ with a focus on simplicity and plain text readability.
 
 1. 测试赛题给出的拓扑图及约束条件:
 
-![case1_f]
-[case1_f]: images/case1_f.jpg "case1_f" { width:auto; float:left; max-width:50% }
-![case1_r]
+![case1]
+[case1]: images/case1.jpg "case1" { width:auto; max-width:100% }
 
-[case1_r]: images/case1_r.jpg "case1_r" { width:auto; max-width:90% }
 
+
+
+
+如上图所示
 
 
 2. 某个节点的多条边均为必经路径；
