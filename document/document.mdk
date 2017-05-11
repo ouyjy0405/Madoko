@@ -35,7 +35,9 @@ Package       : [UTF8]ctex
 2. 令{_P_~ij~ &sub; _E_~q~ | _i_, _j_ &isin; _V_}为顶点_i_到顶点_j_的所有路径集合，_P_~ij~初始值为_m_，即有_m_条路径；{_Q_~ij~ | _i_, _j_ &isin; _V_}为顶点_i_到顶点_j_的有效路径集合，_Q_~ij~初始值为&empty;。假设{_p_~a~, _p_~b~ &isin; _P_~ij~ | a, b &isin;(1, m)}为集合_P_~ij~中的任意两条路径，_d_~a~为_p_~a~的花费(距离),，_d_~b~为_p_~b~的花费(距离)，_n_~a~为_p_~a~中节点数量，_n_~b~为_p_~b~中节点数量。_p_ &isin; _P_~ij~为当前路径。
 
 
-a. {_Q_~ij~}
+a. 当_Q_~ij~ = &empty;, _p_ = (_p_~a~ or _p_~b~)时，将_p_添加到集合_Q_~ij~中，即_Q_~ij~ = {_p_}；
+b. 假设_Q_~ij~ = {_p_~a~}, _p_ = _p_~b~，如果_d_~b~ &gt; _d_~a~ &amp;&amp; _n_~b~ &gt; _n_~a~，则舍弃_p_~b~，搜索_P_~ij~中下一条路径，_Q_~ij~仍是{_p_~a~}，即_Q_~ij~ = {_p_};
+c. 假设_Q_~ij~ = {_p_~a~}, _p_ = _p_~b~，如果_d_~b~ &gt; _d_~a~ &amp;&amp; _n_~b~ &gt; _n_~a~，
 
 
 
