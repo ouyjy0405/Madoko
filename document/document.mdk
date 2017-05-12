@@ -2,7 +2,6 @@ Title         : 迪杰斯特拉派初赛文档
 Author        : hy19890811
 Author        : 欧阳嘉艺
 Author        : HanGH
-Logo          : False
 Package       : [UTF8]ctex
 
 [TITLE]
@@ -148,6 +147,22 @@ case5. 当没有任何一条路径能够从起点到达终点时，会给出相�
 如上图所示，通过将连接起点的所有路径设置为不可经过的红色路段，使得没有任何一条路径能够从起点到达终点。运行程序后会给出提示，而并非程序崩溃。
 
 
-Enjoy!
+# 团队介绍
+
+团队名称: 技术搬运工
+
+团队成员: 
+
+名称: hy19890811     身份证号: 210302198908112411   毕业院校: 辽宁科技大学
+
+名称: 欧阳嘉艺    身份证号: 210303198904052518  毕业院校: 东北大学
+
+名称: 韩贵和 身份证号: 毕业院校: 
+
+团队分工: 
+
+hy19890811: 算法制定、算法编程实现
+欧阳嘉艺: 算法数学建模、paper编写
+韩贵和: 算法制定、paper编写
 
 [reference manual]: http://research.microsoft.com/en-us/um/people/daan/madoko/doc/reference.html  "Madoko reference manual"
