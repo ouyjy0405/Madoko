@@ -23,6 +23,78 @@ Package       : [UTF8]ctex
 - 当最优路径不存在时需要给出多条参考路径；
 - 经过必经点和必经路径，避开红色路段；
 
+## 算法设计思路
+
+通过对赛题的分析，算法设计过程中主要考虑到了以下几个问题：
+
+1.要求经过全部必经点和路径的最短路径，那么该路径子路径也是最短路径，所以求经过全部必经约束的最短路径可以分解为两两必经点的最短路径组合。但是问题是，最短路径不一定能满足最大步数约束。最小步数路径不一定是满足条件的最小距离解。
+
+
+- **例1**：起点s至终点e，A走法距离10步数5，B走法距离5步数10，C走法距离8步数8，D走法距离12步数12。在限制步数为8以下时满足约束的解有最优解为C，最小步数路径和最小距离路径都不是最优路径。
+
+- **有效路径定义：**在两点间的全部路径中，如果一条路径的距离和步数同时大于任意另外一条，那么这条路径没有价值，则它是无效的，反之则是有效的，比如**例1**中的D路径是无效的，A，B，C皆为有效路径。
+
+- **解决思路：**与Dijkstra算法相比，floyd算法不仅能找出任意两点的最短距离路径和最少步数路径，还可以找出全部有效路径。即在每一次搜索点k使得i到j形成新的路径，如果新路径与i,j中原路径集合相比是有效路径则保存下来生成新的路径集合。
+
+
+
+2.通过使用类似floyd的算法，我们已找到任意两点间的全部有效路径集合，我们也知道需要的经过全部必经点的路径就是在在这些路径中的组合，但是在搜索算法中如何实现走过必经边约束呢？
+
+
+- 解决思路：如果将一条必经边p看成两个必经点a1，a2，遍历全部必经点，再保留满足必经边约束的路径便可得到满足必经约束的路径，但是这样做显然不利于算法的灵活性和效率。所以我们把每个必经边看成两条单向路径，在搜索中如果下一个必经约束是必经边（p1,p2），就把当前路径path分为path1=path--->p1->p2和path2=path--->p2->p1(--->表示当前path到p1或p2的若干条路径，->表示p1，p2间的必经边)，这样在进行算法优化等过程中灵活性大大提高。
+
+
+3.如何解决不能通过的路径？如果不能通过路径较多，如何判断是否能够到达终点或必经点是否能够到达？
+
+
+- **解决思路：**在使用floyd搜索有效路径前先忽略不能通过的边， 搜索结束后如果起点与任意必经约束点或边或终点不存在任何路径，则判断该图不能经过约束条件有误。
+
+
+4.已知任意两点有效路径，如何搜索出的最优路径?
+
+- **解决思路：**这是一个时间复杂度较高的问题，在点数较少情况下任何搜索算法均能找到最优解，但要考虑到必经约束的增加问题，我们采用了dfs+剪枝的算法来解决，通过剪枝算法，可以在必经约束位置较松散的情况下有较快的搜索速度。详细在后面有所介绍。
+
+5.如何剪枝?
+
+~ Lemma
+若任意一条经过全部必经点的路径是最短路径，则以该路径中任意一个必经点为起点到终点的路径也必然是一条最短路径。
+~
+
+将搜索到任意非第一个必经点的时候可看做为如下图。其中curt为当前点,pre为上个必经点,next为将要判断是否要走下去的点，end为终点。并用Matrix[x, y]表示x点到y点的路径集合;
+那么该必经顺序组成的全部路径中含有最小权值路径的两个必要条件为: 
+
+- 当前点到终点最小权值大于下个点到终点的最小权值
+Matrix[curt,end].MinWeightPath.WeightValue>Matrix[next,end].MinWeightPath.WeightValue
+- 上个点到当前点的最小权值小于上点到下个点的最小权值
+Matrix[pre,curt].MinWeightPath.WeightValue<Matrix[pre,next].MinWeightPath.WeightValue
+
+将上述结论扩展到距离和步数双权值：
+通过有效路径的定义，可得出该路径必经顺序组合不可能包含有效路径的充分条件为同时不可能包含最小步数路径和最小距离路径，加上两个权值组合则8个必要条件为：
+
+- 以路径花费(距离)最小判断
+
+
+1. 下个点到终点的距离和步数同时大于当前点到终点的距离和步数（相对终点回头）
+Matrix[curt, end].MinDistancePath.Distance < Matrix[next, end].MinDistancePath.Distance 
+Matrix[curt, end].MinDistancePath.Step < Matrix[next, end].MinDistancePath.Step
+2. 上个点到下个点的距离和步数同时小于上个点到当前点的距离和步数(相对起点回头)
+Matrix[pre, next].MinDistancePath.Distance < Matrix[pre, curt].MinDistancePath.Distance 
+Matrix[pre, next].MinDistancePath.Step < Matrix[pre, curt].MinDistancePath.Step 
+
+
+- 以经过节点数最少判断
+
+
+1. 下个点到终点的距离和步数同时大于当前点到终点的距离和步数（相对终点回头）
+Matrix[curt, end].MinStepPath.Distance < Matrix[next, end].MinStepPath.Distance 
+Matrix[curt, end].MinStepPath.Step < Matrix[next, end].MinStepPath.Step
+2. 上个点到下个点的距离和步数同时小于上个点到当前点的距离和步数(相对起点回头)
+Matrix[pre, next].MinStepPath.Distance < Matrix[pre, curt].MinStepPath.Distance 
+Matrix[pre, next].MinStepPath.Step < Matrix[pre, curt].MinStepPath.Step 
+
+证明：令[]表示通过[]内各个节点的最小权值路径，即[pre,curt,next,end]表示pre节点到end节点的最短路径，由[pre,curt,next,end]<[pre,next,curt,end]可得[pre,curt,end]<[pre,next,end]。因为最小权值路径的子路径还是最小权值路径，所以[pre,curt,end]<[pre,next,end]等价于[pre,curt]+[curt.end]<[pre,next]+[next,end]等价于上面不等式俩边相加，所以上述两条件为必要条件。
+
+
 ## 算法数学模型
 
 定义: 图_G_={_V_, _E_, _C_}。其中_V_={1, 2, ..., n}为顶点集合，_E_={_e_~1~, _e_~2~, ..., _e_~m~}为边集合，_C_={_c_~ij~ | _i_, _j_ &isin; _V_}为相应边的非负权值的集合。必经点集合为_V_~p~，必经路径集合为_E_~p~。
@@ -52,17 +124,6 @@ b. 如果_n_~k_E_~&Prime; &lt; _n_~j_E_~&Prime; &amp;&amp; _n_~ik~&Prime; &gt; _
 c. 不满足上述两种情况时，&nu;~pre~ = &nu;~i~, &nu;~cur~ = &nu;~j~, ~next~指向_E_~p~中下一个点；
 
 通过上述的判断条件，达到在搜索最优路径或参考路径时进行了剪枝处理的目的，使得搜索操作的效率大大提高。
-
-## 算法设计思路
-通过1.1.小节的分析，可以发现最优路径是指不超过节点数限制(本题中路径包含的节点数量不超过9个节点)，且花费最小的路径。但是当最优路径不存在时，提供的参考路径需要综合考虑路径经过的节点数和路径的距离(花费)。本文认为需要提供三种类型的参考路径才能使结果具有完备性，第一种是花费最少的路径，第二种是经过节点数最少的路径。当第一种路径经过节点数较多且第二种路径的花费较多时这两种路径显然都不是合理的参考路径，所以需要提供第三种参考路径才能是结果合理且完备。第三种参考路径是指路径的花费和路径经过的节点数均相对较少，在一个合理的范围内，这种参考路径可能会存在多条，都要给出。
-又由于赛题中要求有必经点和必经路径等约束条件，为了保证算法的通用性，本文将赛题的本质归结为求多源最短路径问题。
-
-本文采用Floyd算法和贪心算法的组合，具体解决思路如下所示：
-
-1. 排除红色路段代表不能经过的路径，通过Floyd算法求出任意两个节点之间花费最少的路径和经过节点数最少的路径以及同时包含相对较少的花费和较少的节点数的路径(下文中将这些路径统称为参考路径)并将这些路径进行保存；
-
-2. 
-在求最优路径以及参考路径时主要采用贪心算法的思想，
 
 ## 算法通用性与灵活性分析
 本算法具备很强的通用性和灵活性，具体体现在以下几个方面：
@@ -96,12 +157,40 @@ b代表一个较小的常数，具体是指起点到第一个必经节点(必经
 
 ## 算法实现分析
 
-Madoko is a fast markdown processor for writing professional articles
-with a focus on simplicity and plain text readability.
+由于篇幅有限，详细代码请查看源码。以下用伪代码简要描述。
 
-* Read the [reference manual].
-* Explore the upper-right toolbox menu to discover how Markdown works. 
-* `Alt-Q` reformats the current paragraph.
+
+//Matrix[x,y].Paths表示两点x,y间的有效路径集合
+
+从0开始对任意一个顶点k(k &lt; n);
+ 对任一k取一对顶点i,j  i,j< n;
+   对每对i,k,j 组合出新的路径i->k->j,
+   如果新路径i->k->j是有效路径,则保存到Matrix[i,j].Paths中,并删除Matrix[i,j].Paths中的非有效路径
+   
+对mustPassPoints,mustPassPaths以到终点最远距离排序,使剪枝更快被发现
+
+调用DfsPaths(s,e,mustPassPoints,mustPassPaths,null)
+最后有效路径集合保留在targetPaths
+
+DfsPaths(s,e,mustPassPoints,mustPassPaths,currentPath)
+{
+  如果currentPath为null,对每个必经点和边递归调用DfsPaths
+  否则
+  在mustPassPoints，mustPassPaths中移除当前路径已经经过的必经点和路径;
+  如果已经没有剩余必经点和路径
+   对当前点到终点全部路径，如果是有效路径保存到targetPaths集合中
+  否则
+   对每个剩余必经点
+    剪枝判断，是否不再走索该必经点以后的路径，如果需要剪枝return
+    否则对每个从当前点到达该必经点的路径递归调用DfsPaths
+        
+   对每个剩余必经路径
+    剪枝判断，是否不再走索该必经路径以后的路径，如果需要剪枝return
+    否则
+     如果当前点在下一个必经路径的起点，递归调用DfsPaths
+     否则
+       对每个当前点到下一个必经路径的起点的全部路径,递归调用DfsPaths
+}
 
 # 测试用例及结果分析
 我们组提交的成果物中包含一个可执行文件，双击后将通过图形界面的方式进行展示。我们同样也是采用这种图形界面的方式进行测试并展示测试结果，以这种方式进行测试既直观又灵活方便，测试者可以直观的知道起点、终点、必经点、必经路径和不能走的红色路段的位置，并可随意修改这些约束调节进行测试。本文的测试用例分为两类：正常流测试和异常流测试。
